@@ -1,6 +1,7 @@
 import { ArrowButton } from 'src/ui/arrow-button';
 import { Button } from 'src/ui/button';
 import { RadioGroup } from 'src/ui/radio-group';
+import { Text } from 'src/ui/text';
 import { useEffect, useRef, useState } from 'react';
 import { Select } from 'src/ui/select';
 import {
@@ -31,10 +32,6 @@ export const ArticleParamsForm = ({
 	const [tempState, setTempState] =
 		useState<ArticleStateType>(defaultArticleState);
 
-	// Применённое состояние (передаётся наверх)
-	const [appliedState, setAppliedState] =
-		useState<ArticleStateType>(defaultArticleState);
-
 	// Обработчик изменения опций в форме (обновляет только tempState)
 	const handleOptionChange = (
 		key: keyof ArticleStateType,
@@ -48,21 +45,19 @@ export const ArticleParamsForm = ({
 
 	// Обработка нажатия "Применить"
 	const handleApply = () => {
-		setAppliedState(tempState); // Сохраняем текущие настройки как применённые
-		onStateChange(appliedState); // Передаём в родительский компонент
+		if (!isOpen) return;
+		onStateChange(tempState); // Передаём в родительский компонент
 	};
 
 	// Обработка сброса формы
 	const handleReset = () => {
 		setTempState(defaultArticleState); // Сброс временных настроек
-		setAppliedState(defaultArticleState); // Сброс применённых настроек
 		onStateChange(defaultArticleState); // Уведомляем родительский компонент
 	};
 
 	useEffect(() => {
+		if (!isOpen) return;
 		const handleClickOutside = (event: MouseEvent) => {
-			if (!isOpen) return;
-
 			const path = event.composedPath();
 
 			if (
@@ -99,6 +94,9 @@ export const ArticleParamsForm = ({
 						e.preventDefault();
 						handleApply();
 					}}>
+					<Text as='h2' size={31} weight={800} align={'center'} uppercase>
+						Задайте параметры
+					</Text>
 					<Select
 						title='Шрифт'
 						selected={tempState.fontFamilyOption}
@@ -140,7 +138,7 @@ export const ArticleParamsForm = ({
 					/>
 					<div className={styles.bottomContainer}>
 						<Button title='Сбросить' type='clear' onClick={handleReset} />
-						<Button title='Применить' type='apply' onClick={handleApply} />
+						<Button title='Применить' htmlType='submit' type='apply' />
 					</div>
 				</form>
 			</aside>
